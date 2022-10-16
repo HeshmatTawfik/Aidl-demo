@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.View
 import com.example.client.databinding.ActivityMainBinding
 import com.example.myservice.IMyAidlInterface
 
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         binding.connectBt.setOnClickListener {
             if (isConnected){
                 disconnectFromService()
@@ -27,7 +30,17 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
                 connectToRemoteService()
             }
         }
-        setContentView(binding.root)
+
+        binding.sendBt.setOnClickListener{
+            sendMessage()
+        }
+    }
+
+    private fun sendMessage() {
+        val msg = binding.msgEditText.text.toString()
+        val id = android.os.Process.myPid()
+        remoteService?.sendMessage("$id: $msg")
+        binding.msgEditText.setText("")
     }
 
     private fun connectToRemoteService() {
@@ -48,6 +61,8 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         Log.i(tag, "disconnecting from service")
         binding.textView.text = getString(R.string.disconnected)
         binding.connectBt.text = getString(R.string.connect)
+        binding.msgEditText.visibility = View.GONE
+        binding.sendBt.visibility = View.GONE
 
     }
 
@@ -56,10 +71,9 @@ class MainActivity : AppCompatActivity(), ServiceConnection {
         Log.i(tag, "onServiceConnected: connected to the service")
         remoteService = IMyAidlInterface.Stub.asInterface(binder)
         binding.textView.text = getString(R.string.service_pid,remoteService?.pid)
-        val id = android.os.Process.myPid()
-        remoteService?.sendMessage("my client id is  $id")
         binding.connectBt.text = getString(R.string.disconnect)
-
+        binding.msgEditText.visibility = View.VISIBLE
+        binding.sendBt.visibility = View.VISIBLE
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
