@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Client</string>
+    <string name="service_pid">process id = %1$d</string>
+    <string name="disconnected">disconnected</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connect">Connect</string>
+</resources>
